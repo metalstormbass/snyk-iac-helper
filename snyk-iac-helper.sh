@@ -1,6 +1,12 @@
 #Snyk IaC Helper
 #!/bin/bash
-RED='\033[0;31m'
+RED='\033[1;31m'
+ORANGE='\033[1;33m'
+CYAN='\033[1;36m'
+GRAY='\033[1;30m'
+BLUE='\033[1;34m'
+PURPLE='\033[0;35m'
+LRED='\033[0;31m'
 NC='\033[0m' 
 
 if [ -e snyk_iac_results.json ]
@@ -45,26 +51,42 @@ for i in $(seq 0 $RESULT); do
             then 
             :
         else
-            echo ">>>>>>>> Issue <<<<<<<<"
-            echo ${RED}$ISSUE${NC}; \
+            echo "${PURPLE}>>>>>>>> Issue <<<<<<<<${NC}"
+            echo ${LRED}$ISSUE${NC}; \
             
             printf "Line Number: "
-            cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber'; \
+            #cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber'; \
             LINENUMBER=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber';`
+            echo $LINENUMBER
 
             printf "Severity: "
-            cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].severity'; \
+            SEVERITY=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].severity';` 
+            
+            if [[ "$SEVERITY" == '"critical"' ]]; then            
+                echo ${RED}$SEVERITY${NC}
+            elif [[ "$SEVERITY" == '"high"' ]]; then 
+                echo ${ORANGE}$SEVERITY${NC}
+            elif [[ "$SEVERITY" == '"medium"' ]]; then 
+                echo ${CYAN}$SEVERITY${NC}
+            elif [[ "$SEVERITY" == '"low"' ]]; then 
+                echo ${GRAY}$SEVERITY${NC}
+            fi
+
+
 
             printf  "Impact: " 
-            cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].impact'; \
+            IMPACT=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].impact';` 
+            echo $IMPACT
 
 
+            echo "${LRED}Affected line or block in $FILE${NC}:\n"
+            eval sed -n "$LINENUMBER"p $FILENAME  
+            printf "\n"
 
-            echo "Line of Code in $FILE:"
-            eval sed -n "$LINENUMBER"p $FILENAME  | sed 's/^/       /'
             printf  "Resolve: "
-            cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].resolve'; \
-            echo "\n"
+            RESOLVE=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].resolve';` 
+            echo $RESOLVE
+            printf "\n"
         fi    
     done; \
     echo " ------------------------------------------------------------------------ \n" ; \
