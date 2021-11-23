@@ -43,17 +43,17 @@ for i in $(seq 0 $RESULT); do
             echo ">>>>>>>> Issue <<<<<<<<"
             echo $ISSUE; \
 
-            echo "Severity:"
+            printf "Severity: "
             cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].severity'; \
 
-            echo "Impact:" 
+            printf  "Impact: " 
             cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].impact'; \
 
-            echo "Line Number:"
+            printf "Line Number: "
             cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber'; \
             LINENUMBER=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber';`
     
-            echo "Resolve:"
+            printf  "Resolve: "
             cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].resolve'; \
             
             #Generate Line Numbers
