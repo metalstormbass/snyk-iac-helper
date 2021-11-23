@@ -24,7 +24,8 @@ SEVCOUNT=$((SEVCOUNT-1));
 
 #Loop through files
 for i in $(seq 0 $RESULT); do 
-    FILENAME=`cat snyk_iac_results.json |  jq '.['$i'] | .targetFilePath';` 
+    FILENAME=`cat snyk_iac_results.json |  jq '.['$i'] | .targetFilePath';`
+    printf "File: " 
     echo "$FILENAME" | sed -e 's/^"//' -e 's/"$//'   
 
     SEVCOUNT=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq length`; \
@@ -42,6 +43,10 @@ for i in $(seq 0 $RESULT); do
         else
             echo ">>>>>>>> Issue <<<<<<<<"
             echo $ISSUE; \
+            
+            printf "Line Number: "
+            cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber'; \
+            LINENUMBER=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber';`
 
             printf "Severity: "
             cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].severity'; \
@@ -49,22 +54,15 @@ for i in $(seq 0 $RESULT); do
             printf  "Impact: " 
             cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].impact'; \
 
-            printf "Line Number: "
-            cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber'; \
-            LINENUMBER=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber';`
-    
-            printf  "Resolve: "
-            cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].resolve'; \
-            
-            #Generate Line Numbers
-            #BEFORE=$((LINENUMBER - 5))
-            #AFTER=$((LINENUMBER + 5))
+
 
             echo "Line of Code:"
             eval sed -n "$LINENUMBER"p $FILENAME  | sed 's/^/       /'
+            printf  "Resolve: "
+            cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].resolve'; \
             echo "\n"
         fi    
     done; \
-    echo " ------------------------------------------------------------------------ " ; \
+    echo " ------------------------------------------------------------------------ \n" ; \
 done; \
 rm snyk_iac_results.json
