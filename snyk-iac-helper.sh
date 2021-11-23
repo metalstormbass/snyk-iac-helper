@@ -1,5 +1,8 @@
 #Snyk IaC Helper
 #!/bin/bash
+RED='\033[0;31m'
+NC='\033[0m' 
+
 if [ -e snyk_iac_results.json ]
 then
     rm snyk_iac_results.json
@@ -25,6 +28,7 @@ SEVCOUNT=$((SEVCOUNT-1));
 #Loop through files
 for i in $(seq 0 $RESULT); do 
     FILENAME=`cat snyk_iac_results.json |  jq '.['$i'] | .targetFilePath';`
+    FILE=`cat snyk_iac_results.json |  jq '.['$i'] | .targetFile';`
     printf "File: " 
     echo "$FILENAME" | sed -e 's/^"//' -e 's/"$//'   
 
@@ -42,7 +46,7 @@ for i in $(seq 0 $RESULT); do
             :
         else
             echo ">>>>>>>> Issue <<<<<<<<"
-            echo $ISSUE; \
+            echo ${RED}$ISSUE${NC}; \
             
             printf "Line Number: "
             cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber'; \
@@ -56,7 +60,7 @@ for i in $(seq 0 $RESULT); do
 
 
 
-            echo "Line of Code:"
+            echo "Line of Code in $FILE:"
             eval sed -n "$LINENUMBER"p $FILENAME  | sed 's/^/       /'
             printf  "Resolve: "
             cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].resolve'; \
