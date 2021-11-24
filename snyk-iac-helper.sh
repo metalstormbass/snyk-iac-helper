@@ -4,7 +4,7 @@ RED='\033[1;31m'
 ORANGE='\033[1;33m'
 CYAN='\033[1;36m'
 GRAY='\033[1;30m'
-BLUE='\033[1;34m'
+GREEN='\033[1;32m'
 PURPLE='\033[1;35m'
 BLUE='\033[1;34m'
 NC='\033[0m' 
@@ -43,7 +43,8 @@ for i in $(seq 0 $RESULT); do
     FILENAME=`cat snyk_iac_results.json |  jq '.['$i'] | .targetFilePath';`
     FILE=`cat snyk_iac_results.json |  jq '.['$i'] | .targetFile';`
     printf "File: " 
-    echo "$FILENAME" | sed -e 's/^"//' -e 's/"$//'   
+    echo "$FILENAME" | sed -e 's/^"//' -e 's/"$//' 
+    printf "\n"  
 
     SEVCOUNT=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq length`; \
     SEVCOUNT=$((SEVCOUNT-1)); \
@@ -100,15 +101,25 @@ for i in $(seq 0 $RESULT); do
             printf "\n"
 
             #Resolve
-            printf  "Resolve: "
+            
             RESOLVE=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].resolve';` 
-            echo $RESOLVE
+            if [[ "$RESOLVE" != "null" ]]; then
+                printf  "Resolve: "
+                echo $RESOLVE
+            fi
 
-            #References
-            printf "Documentation: "
-            DOCUMENTATION=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].documentation';`
-            printf $DOCUMENTATION
-            printf "\n\n"
+            #Documentation
+            CUSTOM=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].isGeneratedByCustomRule';`
+            if [[ "$CUSTOM" == "false" ]]; then
+                printf "Documentation: "
+                DOCUMENTATION=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].documentation';`
+                printf $DOCUMENTATION
+                printf "\n\n"
+                else
+                echo "${GREEN}This is a Custom Rule${NC}"
+                printf "\n"
+            fi
+            
         fi    
     done; \
     echo " ------------------------------------------------------------------------ \n" ; \
