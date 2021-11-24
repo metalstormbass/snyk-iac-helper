@@ -9,6 +9,9 @@ PURPLE='\033[1;35m'
 BLUE='\033[1;34m'
 NC='\033[0m' 
 
+printf "\n"
+echo "${PURPLE}Snyk IAC Helper${NC}"
+
 if [ -e snyk_iac_results.json ]
 then
     rm snyk_iac_results.json
@@ -17,12 +20,16 @@ fi
 
 if [ -p /dev/stdin ]; then
         echo "Processing Snyk IaC Data!"
+        printf "\n"
         while IFS= read line; do
                 echo ${line} >> snyk_iac_results.json
 
         done
 else
         echo "This script requires input from Snyk IaC"
+        echo "Example command: ${BLUE}snyk iac test --json | ./snyk-iac-helper.sh${NC}"
+        printf "\n"
+        exit
 fi
 
 RESULT=$(cat snyk_iac_results.json | jq length); 
