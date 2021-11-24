@@ -95,13 +95,17 @@ for i in $(seq 0 $RESULT); do
             IMPACT=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].impact';` 
             echo $IMPACT
 
+            #Path
+            printf  "Path: " 
+            BAD_PATH=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].msg';` 
+            echo $BAD_PATH
+
             #Affected Line
             echo "Affected line or block in ${BLUE}$FILE${NC}:\n"
             eval sed -n "$LINENUMBER"p $FILENAME  
             printf "\n"
 
             #Resolve
-            
             RESOLVE=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].resolve';` 
             if [[ "$RESOLVE" != "null" ]]; then
                 printf  "Resolve: "
