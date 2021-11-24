@@ -105,7 +105,7 @@ for i in $(seq 0 $RESULT); do
             RESOLVE=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].resolve';` 
             if [[ "$RESOLVE" != "null" ]]; then
                 printf  "Resolve: "
-                echo $RESOLVE
+                echo ${GREEN}$RESOLVE${NC}
             fi
 
             #Documentation
