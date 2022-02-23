@@ -40,27 +40,27 @@ SEVCOUNT=$((SEVCOUNT-1));
 
 #Loop through files
 for i in $(seq 0 $RESULT); do 
-    FILENAME=`cat snyk_iac_results.json |  jq '.['$i'] | .targetFilePath';`
-    FILE=`cat snyk_iac_results.json |  jq '.['$i'] | .targetFile';`
+    FILENAME=`cat snyk_iac_results.json |  jq '.targetFilePath';`
+    FILE=`cat snyk_iac_results.json |  jq '.targetFile';`
     printf "File: " 
     echo "$FILENAME" | sed -e 's/^"//' -e 's/"$//' 
     printf "\n"  
 
-    SEVCOUNT=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq length`; \
+    SEVCOUNT=`cat snyk_iac_results.json | jq '.infrastructureAsCodeIssues | select(length > 0)' | jq length`; \
     SEVCOUNT=$((SEVCOUNT-1)); \
     
 
 
     #Loop through sub array
     for j in $(seq 0 $SEVCOUNT); do \
-        ISSUE=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].issue';`
+        ISSUE=`cat snyk_iac_results.json| jq '.infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].issue';`
 
         if [ -z "${ISSUE}" ];
             then 
             :
         else
             #Title
-            TITLE=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].title';`
+            TITLE=`cat snyk_iac_results.json| jq '.infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].title';`
             echo "${PURPLE}>>>>>>>> $TITLE <<<<<<<<${NC}"
             #Issue
             printf "Issue: "
@@ -68,17 +68,17 @@ for i in $(seq 0 $RESULT); do
             
             #Snyk ID
             printf "SNYK ID: "
-            SNYKID=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].publicId';`
+            SNYKID=`cat snyk_iac_results.json | jq '.infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].publicId';`
             echo $SNYKID          
 
             #Line Number
             printf "Line Number: "
-            LINENUMBER=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber';`
+            LINENUMBER=`cat snyk_iac_results.json | jq '.infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].lineNumber';`
             echo $LINENUMBER
 
             #Severity
             printf "Severity: "
-            SEVERITY=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].severity';` 
+            SEVERITY=`cat snyk_iac_results.json | jq '.infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].severity';` 
             
             if [[ "$SEVERITY" == '"critical"' ]]; then            
                 echo ${RED}$SEVERITY${NC}
@@ -92,12 +92,12 @@ for i in $(seq 0 $RESULT); do
 
             #Impact
             printf  "Impact: " 
-            IMPACT=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].impact';` 
+            IMPACT=`cat snyk_iac_results.json| jq '.infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].impact';` 
             echo $IMPACT
 
             #Path
             printf  "Path: " 
-            BAD_PATH=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].msg';` 
+            BAD_PATH=`cat snyk_iac_results.json| jq '.infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].msg';` 
             echo $BAD_PATH
 
             #Affected Line
@@ -106,17 +106,17 @@ for i in $(seq 0 $RESULT); do
             printf "\n"
 
             #Resolve
-            RESOLVE=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].resolve';` 
+            REMEDIATION=`cat snyk_iac_results.json| jq '.infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].remediation';` 
             if [[ "$RESOLVE" != "null" ]]; then
-                printf  "Resolve: "
+                printf  "Remediation: "
                 echo ${GREEN}$RESOLVE${NC}
             fi
 
             #Documentation
-            CUSTOM=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].isGeneratedByCustomRule';`
+            CUSTOM=`cat snyk_iac_results.json | jq '.infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].isGeneratedByCustomRule';`
             if [[ "$CUSTOM" == "false" ]]; then
                 printf "Documentation: "
-                DOCUMENTATION=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].documentation';`
+                DOCUMENTATION=`cat snyk_iac_results.json | jq '.infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].documentation';`
                 printf $DOCUMENTATION
                 printf "\n\n"
                 else
