@@ -21,7 +21,7 @@ fi
 if [ -p /dev/stdin ]; then
         echo "Processing Snyk IaC Data!"
         printf "\n"
-        while IFS= read line; do
+        while IFS= read -r line; do
                 echo ${line} >> snyk_iac_results.json
 
         done
