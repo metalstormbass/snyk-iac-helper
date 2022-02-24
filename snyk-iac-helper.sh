@@ -32,10 +32,21 @@ else
         exit
 fi
 
-RESULT=$(cat snyk_iac_results.json | jq length); 
+#Compensate for Multiple Files
+MULTI=$(head -c 1 snyk_iac_results.json)
 
 
-RESULT=$((RESULT - 1)); 
+if [[ "$MULTI" != "[" ]]; then
+    RESULT='0'
+    (echo "[" && cat snyk_iac_results.json) > snyk_iac_results_temp.json
+    mv snyk_iac_results_temp.json snyk_iac_results.json
+    echo "]" >> snyk_iac_results.json
+else 
+    RESULT=$(cat snyk_iac_results.json | jq length);
+    RESULT=$((RESULT - 1)); 
+fi
+
+
 SEVCOUNT=$((SEVCOUNT-1));
 
 #Loop through files
@@ -49,8 +60,6 @@ for i in $(seq 0 $RESULT); do
     SEVCOUNT=`cat snyk_iac_results.json | jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq length`; \
     SEVCOUNT=$((SEVCOUNT-1)); \
     
-
-
     #Loop through sub array
     for j in $(seq 0 $SEVCOUNT); do \
         ISSUE=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].issue';`
@@ -106,9 +115,9 @@ for i in $(seq 0 $RESULT); do
             printf "\n"
 
             #Resolve
-            RESOLVE=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].resolve';` 
+            REMEDIATION=`cat snyk_iac_results.json| jq '.['$i'] | .infrastructureAsCodeIssues | select(length > 0)' | jq '.['$j'].remediation';` 
             if [[ "$RESOLVE" != "null" ]]; then
-                printf  "Resolve: "
+                printf  "Remediation: "
                 echo ${GREEN}$RESOLVE${NC}
             fi
 
